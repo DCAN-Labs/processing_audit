@@ -17,16 +17,6 @@ def s3_client(access_key,host,secret_key):
 
     
 def s3_get_bids_subjects(access_key,bucketName,host,prefix,secret_key):
-    ## Code below allows subfolders to be searchable
-    ## TODO: Determine how to allow users to choose this code as an option (probs call a different function from run.py based on flag)
-    # if len(prefix) > 0:
-	# 	if prefix[0] == '/':
-	# 		prefix = prefix[1:]
-	# prefix += 'sub-'
-	# client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
-	# paginator = client.get_paginator('list_objects_v2')
-	# page_iterator = paginator.paginate(Bucket=bucketName,Delimiter='/',Prefix=prefix,EncodingType='url',ContinuationToken='', FetchOwner=False, StartAfter='')
-    # get_data = client.list_objects_v2(Bucket=bucketName,Delimiter='/',EncodingType='url', Prefix=prefix, MaxKeys=1000, ContinuationToken='', FetchOwner=False, StartAfter='')
     client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
     paginator = client.get_paginator('list_objects_v2')
     page_iterator = paginator.paginate(Bucket=bucketName,Delimiter='/',Prefix=prefix,EncodingType='url',ContinuationToken='',
@@ -46,11 +36,7 @@ def s3_get_bids_subjects(access_key,bucketName,host,prefix,secret_key):
 
 def s3_get_bids_sessions(access_key,bucketName,host,prefix,secret_key):
     ## Code allows subfolders to be searchable
-    ## TODO: Same as s3_get_bids_subjects
-    # if len(prefix) > 0:
-    #     if prefix[0] == '/':
-    #         prefix = prefix[1:]
-    # prefix += 'ses-'
+    ## TODO: figure out how to input the below code, maybe based on prefix contents or pass in another argument indicating subfolder search
     # bids_sessions = [item['Prefix'].split('/')[2] for item in get_data['CommonPrefixes'] if 'ses' in item['Prefix'].split('/')[2]]
     client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
     get_data = client.list_objects_v2(Bucket=bucketName,Delimiter='/',EncodingType='url',
@@ -63,10 +49,6 @@ def s3_get_bids_sessions(access_key,bucketName,host,prefix,secret_key):
     return bids_sessions
 
 def s3_get_bids_structs(access_key,bucketName,host,prefix,secret_key):
-    ## Makes subfolders searchable
-    # TODO: Probs just change call to this function in run.py to update prefix based on input flag
-    # if prefix[0] == '/':
-    #     prefix = prefix[1:]
     client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
     suffix='_T1w.nii.gz' # looking for at least a T1w file
     try:
@@ -91,10 +73,6 @@ def s3_get_bids_structs(access_key,bucketName,host,prefix,secret_key):
 
 
 def s3_get_bids_funcs(access_key,bucketName,host,prefix,secret_key):
-    ## Makes subfolders searchable
-    # TODO: Same as s3_get_bids_structs     
-    # if prefix[0] == '/':
-    #    prefix = prefix[1:]
     client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
     suffix='_bold.nii.gz' # looking for functional nifti files
     try:
