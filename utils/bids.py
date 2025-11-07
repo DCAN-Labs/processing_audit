@@ -35,9 +35,6 @@ def s3_get_bids_subjects(access_key,bucketName,host,prefix,secret_key):
     return bids_subjects
 
 def s3_get_bids_sessions(access_key,bucketName,host,prefix,secret_key):
-    ## Code allows subfolders to be searchable
-    ## TODO: figure out how to input the below code, maybe based on prefix contents or pass in another argument indicating subfolder search
-    # bids_sessions = [item['Prefix'].split('/')[2] for item in get_data['CommonPrefixes'] if 'ses' in item['Prefix'].split('/')[2]]
     client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
     get_data = client.list_objects_v2(Bucket=bucketName,Delimiter='/',EncodingType='url',
                                           MaxKeys=1000,
@@ -45,7 +42,10 @@ def s3_get_bids_sessions(access_key,bucketName,host,prefix,secret_key):
                                           ContinuationToken='',
                                           FetchOwner=False,
                                           StartAfter='')
-    bids_sessions = [item['Prefix'].split('/')[1] for item in get_data['CommonPrefixes'] if 'ses' in item['Prefix'].split('/')[1]]
+    if prefix.split('/')[-1] == 'ses-':
+        bids_sessions = [item['Prefix'].split('/')[2] for item in get_data['CommonPrefixes'] if 'ses' in item['Prefix'].split('/')[2]]
+    else:
+        bids_sessions = [item['Prefix'].split('/')[1] for item in get_data['CommonPrefixes'] if 'ses' in item['Prefix'].split('/')[1]]
     return bids_sessions
 
 def s3_get_bids_structs(access_key,bucketName,host,prefix,secret_key):
