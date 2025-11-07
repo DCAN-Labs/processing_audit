@@ -18,7 +18,7 @@ import pdb
 __version__ = open(os.path.join(os.path.dirname(os.path.realpath(__file__)),
                                 'version')).read()
 
-parser = argparse.ArgumentParser(description='abcd-hcp-pipeline_audit entrypoint script.')
+parser = argparse.ArgumentParser(description='processing_audit entrypoint script.')
 parser.add_argument('bids_dir', help='The directory with the input dataset '
                     'formatted according to the BIDS standard. In the case that the BIDS dataset is within s3 provide the path to the folder along with "s3://BUCKET_NAME/path_to_BIDS_folder".')
 parser.add_argument('output_dir', help='The directory where the output files '
@@ -50,8 +50,9 @@ parser.add_argument('--session_label', help='The label(s) of the session(s) that
                    'provided all subjects should be analyzed. Multiple '
                    'participants can be specified with a space separated list.',
                    nargs="+")
+# TODO: edit version argument to expand to other pipeline versions, i.e. nibabies, fmriprep, xcp-d, etc. and whatever their current version is/what we've adapted to.
 parser.add_argument('-v', '--version', action='version',
-                    version='abcd-hcp-pipeline_audit version {}'.format(__version__))
+                    version='processing_audit version {}'.format(__version__))
 
 # Parse and gather arguments
 args = parser.parse_args()
@@ -109,7 +110,7 @@ elif args.analysis_level == "group":
     else:
         output_dir_subject_dirs = glob(os.path.join(args.output_dir, "sub-*"))
         output_dir_subjects_to_analyze = [subject_dir for subject_dir in output_dir_subject_dirs]
-    assert len(output_dir_subjects_to_analyze)>0, args.bids_dir + ' has no subject folders within it. Are you sure this the root to the abcd-hcp-pipeline derivatives folder?'   
+    assert len(output_dir_subjects_to_analyze)>0, args.bids_dir + ' has no subject folders within it. Are you sure this the root to the pipeline derivatives folder?'   
 else:
     raise Exception("You must enter participant --participant_label or group in order to run.")
 
@@ -123,6 +124,7 @@ if bids_dir_bucket_name:
                         access_key=args.s3_access_key, 
                         secret_key=args.s3_secret_key, 
                         host=args.s3_hostname) # checking if sessions exist
+    #TODO: expand these expected tasks to be pipeline agnostic
     expected_tasks = s3_get_bids_funcs(access_key=args.s3_access_key,
             bucketName=bids_dir_bucket_name,
             secret_key=args.s3_secret_key, 
@@ -134,6 +136,7 @@ else:
     
 
 print("Found the following fMRI tasks: ", expected_tasks)
+#TODO: expand these expected tasks to be pipeline agnostic
 minimal_proc_expected_tasks = ['Minimal Preprocessing: ' + item for item in expected_tasks]
 dcan_bold_proc_expected_tasks = ['DCANBoldPreProc: ' + item for item in expected_tasks]
 text_expected_tasks = minimal_proc_expected_tasks + dcan_bold_proc_expected_tasks
@@ -184,6 +187,7 @@ for subject in subjects_to_analyze:
                     struct_status = abcd_hcp_struct_status(os.path.join(args.output_dir,subject,session))
                 else:
                     # LOOK IN S3 FOR FINAL STRUCTURAL OUTPUT 
+                    # TODO: change function or add new one for other pipelines
                     struct_status = s3_abcd_hcp_struct_status(bucketName=output_dir_bucket_name,
                             access_key=args.s3_access_key,
                             secret_key=args.s3_secret_key,
@@ -193,6 +197,7 @@ for subject in subjects_to_analyze:
                 struct_status = "NO BIDS"
             session_status.loc[0,'structural'] = struct_status
             if bolds: # if bolds can be found continue, otherwise tag this as "No BIDS"
+                #TODO: change these functions or add new ones for other pipelines
                 if not output_dir_bucket_name:
                     minimal_func_status = abcd_minimal_func_hcp_status_outputs(os.path.join(args.output_dir,subject,session))
                     DCANBoldPreProc_func_status = abcd_hcp_DCANBoldPreProc_func_status(os.path.join(args.output_dir,subject,session))
@@ -213,6 +218,7 @@ for subject in subjects_to_analyze:
                 DCANBoldPreProc_func_status = "NO BIDS"
             # Tag funcs with status
             print('subject:{}, session:{}'.format(subject,session))
+            #TODO: expand these expected tasks to be pipeline agnostic
             for task in expected_tasks:
                 minimal_proc_task = 'Minimal Preprocessing: ' + task
                 dcan_proc_task = 'DCANBoldPreProc: ' + task

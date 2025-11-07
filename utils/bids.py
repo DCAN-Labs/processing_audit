@@ -45,8 +45,11 @@ def s3_get_bids_sessions(access_key,bucketName,host,prefix,secret_key):
     bids_sessions = [item['Prefix'].split('/')[1] for item in get_data['CommonPrefixes'] if 'ses' in item['Prefix'].split('/')[1]]
     return bids_sessions
 
+#TODO: for nibabies, we may want to first look for the exectutive summary file instead of looking for specific files
+
 def s3_get_bids_structs(access_key,bucketName,host,prefix,secret_key):
     client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
+    #TODO: will this suffix work every time? what about other structural files?
     suffix='_T1w.nii.gz' # looking for at least a T1w file
     try:
         get_data = client.list_objects_v2(Bucket=bucketName,EncodingType='url',
@@ -71,6 +74,7 @@ def s3_get_bids_structs(access_key,bucketName,host,prefix,secret_key):
 
 def s3_get_bids_funcs(access_key,bucketName,host,prefix,secret_key):
     client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
+    #TODO: will this suffix work every time? what about other functional files?
     suffix='_bold.nii.gz' # looking for functional nifti files
     try:
         get_data = client.list_objects_v2(Bucket=bucketName,EncodingType='url',
