@@ -42,7 +42,10 @@ def s3_get_bids_sessions(access_key,bucketName,host,prefix,secret_key):
                                           ContinuationToken='',
                                           FetchOwner=False,
                                           StartAfter='')
-    bids_sessions = [item['Prefix'].split('/')[1] for item in get_data['CommonPrefixes'] if 'ses' in item['Prefix'].split('/')[1]]
+    if prefix.split('/')[-1] == 'ses-':
+        bids_sessions = [item['Prefix'].split('/')[2] for item in get_data['CommonPrefixes'] if 'ses' in item['Prefix'].split('/')[2]]
+    else:
+        bids_sessions = [item['Prefix'].split('/')[1] for item in get_data['CommonPrefixes'] if 'ses' in item['Prefix'].split('/')[1]]
     return bids_sessions
 
 def s3_get_bids_structs(access_key,bucketName,host,prefix,secret_key):
