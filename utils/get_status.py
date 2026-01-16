@@ -13,7 +13,7 @@ import pdb
 def fmriprep_exec_sum(output_dir):
     # find executime summary in fmriprep/nibabies output dirs
     suffix = ".html"
-    exec_sum = glob.glob(output_dir + "/sub-*/" + suffix, recursive=True)
+    exec_sum = glob.glob(output_dir + "/sub-*/sub-*" + suffix, recursive=True)
     if exec_sum:
         stage_status = "FOUND_EXEC-SUM"
     else:
