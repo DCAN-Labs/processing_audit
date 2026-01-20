@@ -8,6 +8,7 @@ from utils.bids import s3_get_bids_subjects, s3_get_bids_sessions
 # from utils.get_status import s3_fmriprep_exec_sum, s3_xcpd_exec_sum, s3_fmriprep_crash_log, s3_xcpd_crash_log ## TODO: Build out these functions and incorporate
 from utils.get_status import fmriprep_exec_sum,xcpd_exec_sum, fmriprep_crash_log, xcpd_crash_log
 from utils.html import *
+from datetime import datetime
 import pandas as pd
 import numpy as np
 
@@ -307,12 +308,14 @@ else:
     session_statuses = analyze_local_outputs(subjects_to_analyze, args.pipeline, args.output_dir)
 
 # save output to CSV
+today = datetime.today()
+ran_on = today.strftime(f"%b-%d-%H%M")
 session_statuses = session_statuses.sort_values(by=['subject','session'],ignore_index=True)
 session_statuses = session_statuses.replace(np.nan, '', regex=True)
-session_statuses.to_csv(os.path.join(args.report_output_dir,'s3_status_report.csv'),index=False)
+session_statuses.to_csv(os.path.join(args.report_output_dir,f"{ran_on}_pipeline_audit_report.csv"),index=False)
 
 # generate HTML reporter
 # html_report_wf(session_statuses_df=session_statuses,report_output_dir=args.report_output_dir)
 
-print('CSV and HTML status report files have been outputted to ' + args.report_output_dir)
+print('CSV and HTML status report files have been outputted to ' + f"{args.report_output_dir}{ran_on}_pipeline_audit_report.csv")
         
