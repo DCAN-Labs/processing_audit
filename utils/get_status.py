@@ -52,7 +52,7 @@ def xcpd_exec_sum(output_dir):
         stage_status = "NO_EXEC-SUM"
     return stage_status
 
-def s3_fmriprep_exec_sum(access_key, host, secret_key, bucket_name, prefix):
+def s3_xcpd_exec_sum(access_key, host, secret_key, bucket_name, prefix):
     client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
     suffix = "executive_summary.html"
     try:
@@ -101,6 +101,20 @@ def xcpd_crash_log(output_dir):
         crashed = "NO_CRASH"
     return crashed
 
+def s3_xcpd_crash_log(access_key, host, secret_key, bucket_name, prefix):
+    client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
+    crash_prefix = "crash"
+    try:
+        list_objects = client.list_objects_v2(Bucket=bucket_name, EncodingType='url',MaxKeys=1000,Prefix=prefix,ContinuationToken='',FetchOwner=False,StartAfter='')
+    except KeyError:
+        s3_status = 'NO_OUTPUTS'
+        return s3_status
+    # To determine most recent log dir, list all "dirs" in the log dir and pull their LastModified value (datetime object) from their Key to compare 
+    # Alternative is to pull date and time from dir name but this will be harder i think
+    # documentation here: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/list_objects_v2.html
+    # maybe helpful example here: https://repost.aws/questions/QUFpzxAPCEQa6HqYceZ6bRIA/how-to-list-s3-directories-not-objects-by-date-added
+    # When looping through Keys (after determing correct log bucket), determine status with key.startswith(crash_prefix)
+
 def get_most_recent_dir(log_dirs):
     # determine which log directory is most recent
     most_recent = 1
@@ -111,4 +125,3 @@ def get_most_recent_dir(log_dirs):
             most_recent = created
             recent_dir = folder
     return recent_dir     
-    
