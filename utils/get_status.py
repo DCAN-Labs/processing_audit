@@ -20,6 +20,28 @@ def fmriprep_exec_sum(output_dir):
         stage_status = "NO_EXEC-SUM"
     return stage_status
 
+def s3_fmriprep_exec_sum(access_key, host, secret_key, bucket_name, prefix):
+    # prefix is relative path to outputs (NO leading /!!!)
+    client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
+    suffix = ".html"
+    try:
+        list_objects = client.list_objects_v2(Bucket=bucket_name, EncodingType='url',MaxKeys=1000,Prefix=prefix,ContinuationToken='',FetchOwner=False,StartAfter='')
+    except KeyError:
+        s3_status = 'NO_OUTPUTS'
+        return s3_status
+    try:
+        s3_status = ''
+        for obj in list_objects["Contents"]:
+            key = obj["Key"]
+            if key.endswith(suffix):
+                s3_status = "FOUND_EXEC-SUM"
+            if not s3_status:
+                s3_status = "NO_OUTPUTS"
+            return s3_status
+    except KeyError:
+        s3_status = "NO_EXEC-SUM"
+        return s3_status
+
 def xcpd_exec_sum(output_dir):
     # find executive summary in xcp-d output dirs 
     suffix = "executive_summary.html"
@@ -29,6 +51,27 @@ def xcpd_exec_sum(output_dir):
     else:
         stage_status = "NO_EXEC-SUM"
     return stage_status
+
+def s3_fmriprep_exec_sum(access_key, host, secret_key, bucket_name, prefix):
+    client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
+    suffix = "executive_summary.html"
+    try:
+        list_objects = client.list_objects_v2(Bucket=bucket_name, EncodingType='url',MaxKeys=1000,Prefix=prefix,ContinuationToken='',FetchOwner=False,StartAfter='')
+    except KeyError:
+        s3_status = 'NO_OUTPUTS'
+        return s3_status
+    try:
+        s3_status = ''
+        for obj in list_objects["Contents"]:
+            key = obj["Key"]
+            if key.endswith(suffix):
+                s3_status = "FOUND_EXEC-SUM"
+            if not s3_status:
+                s3_status = "NO_OUTPUTS"
+            return s3_status
+    except KeyError:
+        s3_status = "NO_EXEC-SUM"
+        return s3_status
 
 def fmriprep_crash_log(output_dir):
     # find crash logs in fmriprep/nibabies output dirs
@@ -67,5 +110,5 @@ def get_most_recent_dir(log_dirs):
         if created > most_recent:
             most_recent = created
             recent_dir = folder
-    return recent_dir    
+    return recent_dir     
     
