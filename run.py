@@ -5,7 +5,8 @@ import os
 import subprocess
 from glob import glob
 from utils.bids import s3_get_bids_subjects, s3_get_bids_sessions
-# from utils.get_status import s3_fmriprep_exec_sum, s3_xcpd_exec_sum, s3_fmriprep_crash_log, s3_xcpd_crash_log ## TODO: Build out these functions and incorporate
+from utils.get_status import s3_fmriprep_exec_sum, s3_xcpd_exec_sum
+# , s3_fmriprep_crash_log, s3_xcpd_crash_log ## TODO: Build out these functions and incorporate
 from utils.get_status import fmriprep_exec_sum,xcpd_exec_sum, fmriprep_crash_log, xcpd_crash_log
 from utils.html import *
 from datetime import datetime
@@ -89,7 +90,7 @@ def get_local_inputs():
     
     return subjects_to_analyze    
 
-def analyze_s3_outputs(subjects_to_analyze, bids_dir_bucket_name, bids_dir_relative_path):
+def analyze_s3_outputs(subjects_to_analyze, bids_dir_bucket_name, bids_dir_relative_path, pipeline, access_key, host, secret_key, output_bucket_name, out_dir_relative_path):
     columns=["sub_id","ses_id","crash_log","exec_sum"]
     session_statuses = pd.DataFrame(columns=columns)
     study_ses_count = 0
@@ -104,6 +105,21 @@ def analyze_s3_outputs(subjects_to_analyze, bids_dir_bucket_name, bids_dir_relat
             session_status = pd.DataFrame(columns=columns,index=range(1))
             session_status.loc[0].sub_id = subject.split('-')[1]
             session_status.loc[0].ses_id = session.split('-')[1]
+            prefix = out_dir_relative_path + subject + '/' ## CHANGES FOR BCP since its organized as bucket/subdir/sub_ses/sub/ instead of bucket/subdir/sub/ TODO: figure out best way to indicate this
+            if pipeline == "xcpd":
+                exec_sum_status = s3_xcpd_exec_sum(access_key, host, secret_key, output_bucket_name, prefix)
+                # crash_status = s3_xcpd_crash_log(output_dir)
+            else:
+                exec_sum_status = s3_fmriprep_exec_sum(access_key, host, secret_key, output_bucket_name, prefix)
+                # crash_status = fmriprep_crash_log(output_dir)
+            if exec_sum_status == "FOUND_EXEC-SUM":
+                status = "success?"
+            else:
+                status = "failed?"
+            session_status.loc[0,'exec_sum'] = exec_sum_status
+            session_status.loc[0,'status'] = status
+            session_statuses = pd.concat([session_statuses,session_status],ignore_index=True)
+    return session_statuses
     ## TODO: follow logic of local outputs function once S3 functions have been built out
 
 def analyze_local_outputs(subjects_to_analyze, pipeline, output_dir):
@@ -312,10 +328,10 @@ today = datetime.today()
 ran_on = today.strftime(f"%b-%d-%H%M")
 session_statuses = session_statuses.sort_values(by=['subject','session'],ignore_index=True)
 session_statuses = session_statuses.replace(np.nan, '', regex=True)
-session_statuses.to_csv(os.path.join(args.report_output_dir,f"{ran_on}_pipeline_audit_report.csv"),index=False)
+session_statuses.to_csv(os.path.join(args.report_output_dir,f"{ran_on}_{args.pipeline}_audit_report.csv"),index=False)
 
 # generate HTML reporter
 # html_report_wf(session_statuses_df=session_statuses,report_output_dir=args.report_output_dir)
 
-print('CSV and HTML status report files have been outputted to ' + f"{args.report_output_dir}{ran_on}_pipeline_audit_report.csv")
+print('CSV and HTML status report files have been outputted to ' + f"{args.report_output_dir}{ran_on}_{args.pipeline}_audit_report.csv")
         
