@@ -30,6 +30,7 @@ parser.add_argument('analysis_level', help='Level of the analysis that will be p
                     'Unless checking on status of one participant''s processing, use "group".',
                     choices=['participant', 'group'])
 parser.add_argument('--report_output_dir','--report-output-dir',required=True, help='The directory where the CSV and HTML files will be outputted once the report finishes.')
+parser.add_argument('-p', '--pipeline', required=True, help="Which processing pipeline you're using. Currently supports Nibabies, fMRIprep, and XCP-D")
 parser.add_argument('--participant_label', '--participant-label',help='The label(s) of the participant(s) that should be analyzed. The label '
                    'corresponds to sub-<participant_label> from the BIDS spec '
                    '(so it does not include "sub-"). If this parameter is not '
@@ -45,37 +46,40 @@ parser.add_argument('--s3_secret_key',required=False,type=str,
                         help='Your S3 secret key. If using MSI, this can be found at: https://www.msi.umn.edu/content/s3-credentials')                        
 parser.add_argument('--skip_bids_validator', help='Whether or not to perform BIDS dataset validation',
                    action='store_true')
-parser.add_argument('--session_label', help='The label(s) of the session(s) that should be analyzed. The label '
-                   'corresponds to ses-<session_label> from the BIDS spec '
-                   '(so it does not include "sub-"). If this parameter is not '
-                   'provided all subjects should be analyzed. Multiple '
-                   'participants can be specified with a space separated list.',
-                   nargs="+")
-# TODO: edit version argument to expand to other pipeline versions, i.e. nibabies, fmriprep, xcp-d, etc. and whatever their current version is/what we've adapted to.
-parser.add_argument('-p', '--pipeline', required=True, help="Which processing pipeline you're using. Currently supports Nibabies, fMRIprep, and XCP-D")
+
+# parser.add_argument('--session_label', help='The label(s) of the session(s) that should be analyzed. The label '
+#                    'corresponds to ses-<session_label> from the BIDS spec '
+#                    '(so it does not include "sub-"). If this parameter is not '
+#                    'provided all subjects should be analyzed. Multiple '
+#                    'participants can be specified with a space separated list.',
+#                    nargs="+")
+
 # parser.add_argument('-v', '--version', action='version',
 #                     version='processing_audit version {}'.format(__version__))
 
 # Parse and gather arguments
 args = parser.parse_args()
 
-def get_s3_inputs():
-    bids_dir_bucket_name = args.bids_dir.split('s3://')[1].split('/')[0]
-    bids_dir_relative_path = args.bids_dir.split('s3://'+bids_dir_bucket_name)[1]
-    if bids_dir_relative_path == '/': 
-        bids_dir_relative_path = ''
-        # only for a subset of subjects at participant level
+def get_s3_inputs(bids_bucket, bids_relative_path, sub_search):
+    # Only look for a subset of subjects at participant level
     if args.participant_label and args.analysis_level == "participant":
         subjects_to_analyze = args.participant_label
     else:
-        subjects_to_analyze = s3_get_bids_subjects(bucketName=bids_dir_bucket_name, 
-                            prefix=bids_dir_relative_path,
+        s3_prefix = bids_relative_path
+        if sub_search: 
+            if len(s3_prefix) > 0:
+                if s3_prefix[0] == '/':
+                    s3_prefix = s3_prefix[1:]
+        s3_prefix += 'sub-'
+        subjects_to_analyze = s3_get_bids_subjects(bucketName=bids_bucket, 
+                            prefix=s3_prefix,
                             access_key=args.s3_access_key, 
                             secret_key=args.s3_secret_key, 
                             host=args.s3_hostname)
     assert len(subjects_to_analyze)>0, args.bids_dir + ' has no subject folders within it. Are you sure this the root to the BIDS folder?'
+    
     if not 'sub-' in subjects_to_analyze[0]:
-        subjects_to_analyze[0] = 'sub-'+subjects_to_analyze[0]
+        subjects_to_analyze[0] = 'sub-' + subjects_to_analyze[0]
 
     return subjects_to_analyze
 
@@ -90,27 +94,39 @@ def get_local_inputs():
     
     return subjects_to_analyze    
 
-def analyze_s3_outputs(subjects_to_analyze, bids_dir_bucket_name, bids_dir_relative_path, pipeline, access_key, host, secret_key, output_bucket_name, out_dir_relative_path):
+def analyze_s3_outputs(subjects_to_analyze, bids_bucket, bids_relative_path, pipeline, output_bucket, output_relative_path, sub_search):
     columns=["sub_id","ses_id","crash_log","exec_sum"]
     session_statuses = pd.DataFrame(columns=columns)
-    study_ses_count = 0
     for subject in subjects_to_analyze:
-        sessions_to_analyze = s3_get_bids_sessions(bucketName=bids_dir_bucket_name, 
-                            prefix=bids_dir_relative_path + subject+'/',
+        print(f"Auditing {subject} outputs")
+        s3_prefix = bids_relative_path + subject + '/'
+        # print(s3_prefix)
+        # print(output_relative_path)
+        if sub_search:
+            if len(s3_prefix) > 0:
+                if s3_prefix[0] == '/':
+                    s3_prefix = s3_prefix[1:]
+            s3_prefix += 'ses-'
+        # print(s3_prefix)
+        sessions_to_analyze = s3_get_bids_sessions(bucketName=bids_bucket, 
+                            prefix=s3_prefix,
                             access_key=args.s3_access_key, 
                             secret_key=args.s3_secret_key, 
                             host=args.s3_hostname) # checking if sessions exist
         for session in sessions_to_analyze:
-            study_ses_count = study_ses_count + 1
             session_status = pd.DataFrame(columns=columns,index=range(1))
             session_status.loc[0].sub_id = subject.split('-')[1]
             session_status.loc[0].ses_id = session.split('-')[1]
-            prefix = out_dir_relative_path + subject + '/' ## CHANGES FOR BCP since its organized as bucket/subdir/sub_ses/sub/ instead of bucket/subdir/sub/ TODO: figure out best way to indicate this
+            if "bcp" in output_bucket: ## Prefix changes for BCP since its organized as bucket/subdir/sub_ses/sub/ instead of bucket/subdir/sub/
+                prefix = output_relative_path + subject + '_' + session + '/' 
+            else:
+                prefix = output_relative_path + subject + '/'
+            # print(prefix)
             if pipeline == "xcpd":
-                exec_sum_status = s3_xcpd_exec_sum(access_key, host, secret_key, output_bucket_name, prefix)
+                exec_sum_status = s3_xcpd_exec_sum(args.s3_access_key, args.s3_hostname, args.s3_secret_key, output_bucket, prefix)
                 # crash_status = s3_xcpd_crash_log(output_dir)
             else:
-                exec_sum_status = s3_fmriprep_exec_sum(access_key, host, secret_key, output_bucket_name, prefix)
+                exec_sum_status = s3_fmriprep_exec_sum(args.s3_access_key, args.s3_hostname, args.s3_secret_key, output_bucket, prefix)
                 # crash_status = fmriprep_crash_log(output_dir)
             if exec_sum_status == "FOUND_EXEC-SUM":
                 status = "success?"
@@ -314,24 +330,51 @@ def old_code():
             continue
 
 if 's3://' in args.bids_dir:
-    subjects_to_analyze = get_s3_inputs()
+    bids_bucket = args.bids_dir.split('s3://')[1].split('/')[0]
+    # Check if a subfolder is given 
+    bids_relative_path = args.bids_dir.split('s3://' + bids_bucket)[1]
+    if bids_relative_path == '/': 
+        bids_relative_path = ''
+
+if 's3://' in args.output_dir:
+    output_bucket = args.output_dir.split('s3://')[1].split('/')[0]
+    # Check if a subfolder is given 
+    output_relative_path = args.output_dir.split('s3://'+output_bucket)[1]
+    if output_relative_path == '/':
+        output_relative_path = ''
+    # Trim leading / 
+    elif output_relative_path[0] == '/':
+        output_relative_path = output_relative_path[1:]
+    # Make sure path ends in /
+    if len(output_relative_path) > 0 and not output_relative_path[-1] == '/':
+        output_relative_path = output_relative_path + '/'
+
+if 's3://' in args.bids_dir:
+    if bids_relative_path == '':
+        subjects_to_analyze = get_s3_inputs(bids_bucket, bids_relative_path, False)
+    else:
+        subjects_to_analyze = get_s3_inputs(bids_bucket, bids_relative_path, True)
+
 else:
     subjects_to_analyze = get_local_inputs()
     
 if 's3://' in args.output_dir:
-    session_statuses = analyze_s3_outputs(subjects_to_analyze)
+    if output_relative_path == '':
+        session_statuses = analyze_s3_outputs(subjects_to_analyze, bids_bucket, bids_relative_path, args.pipeline, output_bucket, output_relative_path, False)
+    else:
+        session_statuses = analyze_s3_outputs(subjects_to_analyze, bids_bucket, bids_relative_path, args.pipeline, output_bucket, output_relative_path, True)
 else:
     session_statuses = analyze_local_outputs(subjects_to_analyze, args.pipeline, args.output_dir)
 
 # save output to CSV
 today = datetime.today()
 ran_on = today.strftime(f"%b-%d-%H%M")
-session_statuses = session_statuses.sort_values(by=['subject','session'],ignore_index=True)
+session_statuses = session_statuses.sort_values(by=['sub_id','ses_id'],ignore_index=True)
 session_statuses = session_statuses.replace(np.nan, '', regex=True)
 session_statuses.to_csv(os.path.join(args.report_output_dir,f"{ran_on}_{args.pipeline}_audit_report.csv"),index=False)
 
 # generate HTML reporter
 # html_report_wf(session_statuses_df=session_statuses,report_output_dir=args.report_output_dir)
 
-print('CSV and HTML status report files have been outputted to ' + f"{args.report_output_dir}{ran_on}_{args.pipeline}_audit_report.csv")
+print('CSV status report has been writen to ' + f"{args.report_output_dir}{ran_on}_{args.pipeline}_audit_report.csv")
         
