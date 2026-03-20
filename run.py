@@ -17,33 +17,33 @@ import numpy as np
 import pdb
 
 __version__ = open(os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                                'version')).read()
+								'version')).read()
 
 parser = argparse.ArgumentParser(description='processing_audit entrypoint script.')
 parser.add_argument('bids_dir', help='The directory with the input dataset '
-                    'formatted according to the BIDS standard. In the case that the BIDS dataset is within s3 provide the path to the folder along with "s3://BUCKET_NAME/path_to_BIDS_folder".')
+					'formatted according to the BIDS standard. In the case that the BIDS dataset is within s3 provide the path to the folder along with "s3://BUCKET_NAME/path_to_BIDS_folder".')
 parser.add_argument('output_dir', help='The directory where the output files '
-                    'are stored. If you are running group level analysis '
-                    'this folder should be prepopulated with the results of the'
-                    'participant level analysis.In the case that this folderis within s3 provide the path to the folder along with "s3://BUCKET_NAME/path_to_derivatives_folder".')
+					'are stored. If you are running group level analysis '
+					'this folder should be prepopulated with the results of the'
+					'participant level analysis.In the case that this folderis within s3 provide the path to the folder along with "s3://BUCKET_NAME/path_to_derivatives_folder".')
 parser.add_argument('analysis_level', help='Level of the analysis that will be performed. '
-                    'Unless checking on status of one participant''s processing, use "group".',
-                    choices=['participant', 'group'])
+					'Unless checking on status of one participant''s processing, use "group".',
+					choices=['participant', 'group'])
 parser.add_argument('--report_output_dir','--report-output-dir',required=True, help='The directory where the CSV and HTML files will be outputted once the report finishes.')
 parser.add_argument('-p', '--pipeline', required=True, help="Which processing pipeline you're using. Currently supports Nibabies, fMRIprep, and XCP-D")
 parser.add_argument('--participant_label', '--participant-label',help='The label(s) of the participant(s) that should be analyzed. The label '
-                   'corresponds to sub-<participant_label> from the BIDS spec '
-                   '(so it does not include "sub-"). If this parameter is not '
-                   'provided all subjects should be analyzed. Multiple '
-                   'participants can be specified with a space separated list.',
-                   nargs="+")
+				   'corresponds to sub-<participant_label> from the BIDS spec '
+				   '(so it does not include "sub-"). If this parameter is not '
+				   'provided all subjects should be analyzed. Multiple '
+				   'participants can be specified with a space separated list.',
+				   nargs="+")
 parser.add_argument('--n_cpus',required=False,help='Number of CPUs to use for parallel download.',type=int)
 parser.add_argument('--s3_access_key',required=False,type=str,
-                        help='Your S3 access key, if data is within S3. If using MSI, this can be found at: https://www.msi.umn.edu/content/s3-credentials')
+						help='Your S3 access key, if data is within S3. If using MSI, this can be found at: https://www.msi.umn.edu/content/s3-credentials')
 parser.add_argument('--s3_hostname',required=False,default='https://s3.msi.umn.edu',type=str,
-                        help='URL for S3 storage hostname, if data is within S3 bucket. Defaults to s3.msi.umn.edu for MSIs tier 2 CEPH storage.')
+						help='URL for S3 storage hostname, if data is within S3 bucket. Defaults to s3.msi.umn.edu for MSIs tier 2 CEPH storage.')
 parser.add_argument('--s3_secret_key',required=False,type=str,
-                        help='Your S3 secret key. If using MSI, this can be found at: https://www.msi.umn.edu/content/s3-credentials')                        
+						help='Your S3 secret key. If using MSI, this can be found at: https://www.msi.umn.edu/content/s3-credentials')                        
 parser.add_argument('--skip_bids_validator', help='Whether or not to perform BIDS dataset validation',
                    action='store_true')
 
