@@ -1,6 +1,8 @@
-# abcd-hcp-pipeline_audit
+# processing audit
 
-This audit is used to check on the status of jobs running the ABCD-HCP pipeline. It takes in a BIDS valid input folder, and an output folder where the pipeline outputs are stored. It compares them to determine if the pipeline produced the expected outputs and if they are BIDS valid. It will produce a csv and html file with each subject/session from the input folder and a column for each of the runs it found, filled with 'ok', 'NO ABCD-HCP-PIPELINE', or 'NO BIDS'. Input and output folders can be either s3 buckets or on Tier 1 storage. If you are using data on the s3, you need to provide the s3 access and secret keys.
+This audit is used to check on the status of jobs running either the NiBabies (infant-fMRIprep), fMRIprep, or XCP-D pipeline. It takes in a BIDS valid input folder, and an output folder where the pipeline outputs are stored. It searches through the BIDS input folder to find which subject and session to check for, then searches the output folder for if an executive summary was created and if a crash file exists. PLEASE NOTE THAT THE S3 FUNCTIONALITY FOR CHECKING CRASH LOGS IS NOT YET BUILT, IT WILL ONLY CHECK IF THERE IS AN EXECUTIVE SUMMARY. It will produce a csv and html file with each subject/session from the input folder and a column for the overall status, filled with 'success?', 'fail?' and columns for the executive summary and crash log, marking them found, not found, or if no outputs were found. Input and output folders can be either s3 buckets or on Tier 1 storage. If you are using data on the s3, you need to provide the s3 access and secret keys.
+
+Please not that not all of these flags have been fully implemented in this audit version yet, as this was directly forked from the abcd-hcp-pipline_audit.
 
 ## Usage
 ```
@@ -64,29 +66,9 @@ optional arguments:
                         this parameter is not provided all subjects should be
                         analyzed. Multiple participants can be specified with
                         a space separated list.
-  -v, --version         show program's version number and exit
+  -p, --pipeline 
+                        Which processing pipeline you're wanting to audit. 
+                        Currently supports nibabies, fmriprep, and xcpd. 
+                        Please enter the pipelines in all lowercase.
 
-```
-## Merging Multiple Outputs
-
-If you need to run the audit on more than one output bucket, therefore creating multiple status.csv files, you can use the `concat_s3_status.py` script to merge them together. This script will merge the multiple csvs into one output csv without any duplicates (unless the `--keep-duplicate-ids` flag is specified). If you want to keep track of where each subject originated from, you can specify the `src_csv` flag which will add a column that contains the path to which input csv that row came from. You can specify the `last-ok-col` flag to add a column that contains the last column in a row that has "ok" as the value. 
-
-## Usage
-```
-usage: merge_s3.py [-h] -i INPUT [INPUT ...] -o OUTPUT [--last-ok-col]
-                   [--src-csv] [--keep-duplicate-ids]
-
-Process CSV files and create output CSV.
-
-required arguments:
-  -i INPUT [INPUT ...], --input INPUT [INPUT ...]
-                        Paths to input CSV files
-  -o OUTPUT, --output OUTPUT
-                        Path to the output CSV file
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --last-ok-col         Include 'last_ok_col' column in the output
-  --src-csv             Include 'src_csv' column in the output
-  --keep-duplicate-ids  Keep duplicate rows based on 'subj_id'
 ```

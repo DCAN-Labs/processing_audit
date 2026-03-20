@@ -10,6 +10,7 @@ from botocore.handlers import disable_signing
 from .bids import s3_client
 import pdb
 
+#TODO: the status parsing is not available in nibabies, so need to think of a different way to handle this
 def parse_s3_status_json(access_key,host,secret_key,bucketName,key):
     client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
     posix_key = key.replace('%2F','/')
@@ -57,7 +58,7 @@ def parse_status_json(json_file):
     return status
         
 
-   
+#TODO: the structual status parsing via the json files is not available in nibabies, so need to think of a different way to handle this
 def s3_abcd_hcp_struct_status(bucketName,access_key,secret_key,host,prefix):
     client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
     suffix='status.json'
@@ -84,6 +85,7 @@ def s3_abcd_hcp_struct_status(bucketName,access_key,secret_key,host,prefix):
         stage_status = 'NO_ABCD-HCP'
         return stage_status
 
+#TODO: the functional status parsing via the json files is not available in nibabies, so need to think of a different way to handle this
 def s3_abcd_hcp_minimal_func_status(bucketName,access_key,secret_key,host,prefix):
     client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
     suffix='status.json'
@@ -109,7 +111,8 @@ def s3_abcd_hcp_minimal_func_status(bucketName,access_key,secret_key,host,prefix
     except KeyError:
         stage_status = 'NO_ABCD-HCP'
         return stage_status
-
+    
+#TODO: the DCANBoldPreProc status parsing via the json files is not available in nibabies, so need to think of a different way to handle this
 def s3_abcd_hcp_DCANBoldPreProc_func_status(bucketName,access_key,secret_key,host,prefix):
     client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
     suffix='status.json'
@@ -136,6 +139,7 @@ def s3_abcd_hcp_DCANBoldPreProc_func_status(bucketName,access_key,secret_key,hos
         stage_status = 'NO_ABCD-HCP'
         return stage_status
 
+#TODO: below are local parsing functions and they dont rely on the s3 client
 def abcd_hcp_struct_status(output_dir):
     suffix='status.json'
     get_status_json = glob.glob(output_dir+"/**/logs/PostFreeSurfer/"+suffix,recursive=True)
@@ -163,6 +167,7 @@ def abcd_hcp_DCANBoldPreProc_func_status(output_dir):
         stage_status = 'NO_ABCD-HCP'
     return stage_status
 
+#TODO: s3 client call, these need to be modified for nibabies functions
 def s3_abcd_hcp_struct_outputs(bids_prefix,bucketName,access_key,derivatives_prefix,secret_key,host,subject,scanning_session,client):
     client = s3_client(access_key=access_key,host=host,secret_key=secret_key)
 
