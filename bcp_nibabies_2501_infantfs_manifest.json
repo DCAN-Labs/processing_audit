@@ -1,0 +1,179 @@
+{
+  "pipeline": "nibabies",
+  "version": "25.0.1",
+  "parameters": {
+    "cifti-output": "91k",
+    "output-spaces": "MNI152NLin6Asym:res-2",
+    "surface-recon-method": "infantfs"
+  },
+  "manifest": {
+    "PreFreeSurfer": {
+      "description": "Anatomical volume processing (bias correction, segmentation, registration). Outputs in 'anat' directory.",
+      "outputs": {
+        "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_T1w.nii.gz": [
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_desc-preproc_T1w.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_from-T1w_to-MNI152NLin6Asym_mode-image_xfm.h5",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_from-MNI152NLin6Asym_to-T1w_mode-image_xfm.h5",          
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_desc-brain_mask.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_space-MNI152NLin6Asym_res-2_desc-brain_mask.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_label-CSF_probseg.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_label-GM_probseg.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_label-WM_probseg.nii.gz"
+        ],
+        "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_T2w.nii.gz": [
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_desc-preproc_T2w.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_from-T2w_to_T1w_mode-image_xfm.h5",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_from-T1w_to_T2w_mode-image_xfm.h5"
+
+        ]
+      }
+    },
+    "FreeSurfer": {
+      "description": "Infant FreeSurfer surface reconstruction outputs",
+      "outputs": {
+        "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_T1w.nii.gz": [
+          "sourcedata/sub-{SUBJECT}_ses-{SESSION}/surf/lh.white",
+          "sourcedata/sub-{SUBJECT}_ses-{SESSION}/surf/rh.white",
+          "sourcedata/sub-{SUBJECT}_ses-{SESSION}/surf/lh.pial",
+          "sourcedata/sub-{SUBJECT}_ses-{SESSION}/surf/rh.pial",
+          "sourcedata/sub-{SUBJECT}_ses-{SESSION}/surf/lh.sphere",
+          "sourcedata/sub-{SUBJECT}_ses-{SESSION}/surf/rh.sphere",
+          "sourcedata/sub-{SUBJECT}_ses-{SESSION}/surf/lh.sphere.reg",
+          "sourcedata/sub-{SUBJECT}_ses-{SESSION}/surf/rh.sphere.reg",
+          "sourcedata/sub-{SUBJECT}_ses-{SESSION}/surf/lh.curv",
+          "sourcedata/sub-{SUBJECT}_ses-{SESSION}/surf/rh.curv",
+          "sourcedata/sub-{SUBJECT}_ses-{SESSION}/surf/lh.sulc",
+          "sourcedata/sub-{SUBJECT}_ses-{SESSION}/surf/rh.sulc",
+          "sourcedata/sub-{SUBJECT}_ses-{SESSION}/surf/lh.thickness",
+          "sourcedata/sub-{SUBJECT}_ses-{SESSION}/surf/rh.thickness"
+      }
+    },
+    "PostFreeSurfer": {
+      "description": "Post-FreeSurfer surface outputs",
+      "outputs": {
+        "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_T1w.nii.gz": [
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-L_pial.surf.gii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-R_pial.surf.gii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-L_white.surf.gii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-R_white.surf.gii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-L_sphere.surf.gii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-R_sphere.surf.gii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-L_midthickness.surf.gii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-R_midthickness.surf.gii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_space-fsLR_den-32k_hemi-L_pial.surf.gii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_space-fsLR_den-32k_hemi-R_pial.surf.gii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_space-fsLR_den-32k_hemi-L_midthickness.surf.gii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_space-fsLR_den-32k_hemi-R_midthickness.surf.gii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_space-fsLR_den-32k_hemi-L_white.surf.gii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_space-fsLR_den-32k_hemi-R_white.surf.gii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-L_curv.dscalar.nii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-R_curv.dscalar.nii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-L_sulc.dscalar.nii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-R_sulc.dscalar.nii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-L_thickness.dscalar.nii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-R_thickness.dscalar.nii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-L_space-fsLR_den-91k_curv.dscalar.nii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-R_space-fsLR_den-91k_curv.dscalar.nii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-L_space-fsLR_den-91k_sulc.dscalar.nii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-R_space-fsLR_den-91k_sulc.dscalar.nii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-L_space-fsLR_den-91k_thickness.dscalar.nii",
+          "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_hemi-R_space-fsLR_den-91k_thickness.dscalar.nii"
+        ]
+      }
+    },
+    "FMRIVolume": {
+      "description": "Functional volume processing (motion correction, SDC) in standard space. Outputs in 'func' and 'fmap' directories.",
+      "outputs": {
+        "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*1*_bold.nii.gz": [
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*1*_desc-hmc_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*1*_desc-coreg_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*1*_from-boldref*.txt",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*1*_space-MNI152NLin6Asym_res-2_desc-preproc_bold.nii.gz",          
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*1*_space-MNI152NLin6Asym_res-2_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*1*_space-MNI152NLin6Asym_res-2_desc-brain_mask.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*1*_desc-confounds_timeseries.tsv"
+        ],
+        "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*2*_bold.nii.gz": [
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*2*_desc-hmc_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*2*_desc-coreg_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*2*_from-boldref*.txt",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*2*_space-MNI152NLin6Asym_res-2_desc-preproc_bold.nii.gz",          
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*2*_space-MNI152NLin6Asym_res-2_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*2*_space-MNI152NLin6Asym_res-2_desc-brain_mask.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*2*_desc-confounds_timeseries.tsv"
+        ],
+        "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*3*_bold.nii.gz": [
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*3*_desc-hmc_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*3*_desc-coreg_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*3*_from-boldref*.txt",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*3*_space-MNI152NLin6Asym_res-2_desc-preproc_bold.nii.gz",          
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*3*_space-MNI152NLin6Asym_res-2_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*3*_space-MNI152NLin6Asym_res-2_desc-brain_mask.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*3*_desc-confounds_timeseries.tsv"
+        ],
+        "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*4*_bold.nii.gz": [
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*4*_desc-hmc_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*4*_desc-coreg_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*4*_from-boldref*.txt",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*4*_space-MNI152NLin6Asym_res-2_desc-preproc_bold.nii.gz",          
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*4*_space-MNI152NLin6Asym_res-2_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*4*_space-MNI152NLin6Asym_res-2_desc-brain_mask.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*4*_desc-confounds_timeseries.tsv"
+        ],
+        "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*5*_bold.nii.gz": [
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*5*_desc-hmc_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*5*_desc-coreg_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*5*_from-boldref*.txt",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*5*_space-MNI152NLin6Asym_res-2_desc-preproc_bold.nii.gz",          
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*5*_space-MNI152NLin6Asym_res-2_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*5*_space-MNI152NLin6Asym_res-2_desc-brain_mask.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*5*_desc-confounds_timeseries.tsv"
+        ],
+        "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*6*_bold.nii.gz": [
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*6*_desc-hmc_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*6*_desc-coreg_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*6*_from-boldref*.txt",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*6*_space-MNI152NLin6Asym_res-2_desc-preproc_bold.nii.gz",          
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*6*_space-MNI152NLin6Asym_res-2_boldref.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*6*_space-MNI152NLin6Asym_res-2_desc-brain_mask.nii.gz",
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*6*_desc-confounds_timeseries.tsv"
+        ],
+        "sub-{SUBJECT}/ses-{SESSION}/fmap/sub-{SUBJECT}_ses-{SESSION}_dir-*_epi.nii.gz": [
+          "sub-{SUBJECT}/ses-{SESSION}/fmap/sub-{SUBJECT}_ses-{SESSION}_fmapid*_desc-preproc_fieldmap.nii.gz"
+        ]
+      }
+    },
+    "FMRISurface": {
+      "description": "Functional data projected onto surfaces (CIFTI output). Outputs in 'func' directory.",
+      "outputs": {
+        "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*1*_bold.nii.gz": [
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*1*_space-fsLR_den-91k_bold.dtseries.nii"
+        ],
+        "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*2*_bold.nii.gz": [
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*2*_space-fsLR_den-91k_bold.dtseries.nii"
+        ],
+        "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*3*_bold.nii.gz": [
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*3*_space-fsLR_den-91k_bold.dtseries.nii"
+        ],
+        "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*4*_bold.nii.gz": [
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*4*_space-fsLR_den-91k_bold.dtseries.nii"
+        ],
+        "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*5*_bold.nii.gz": [
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*5*_space-fsLR_den-91k_bold.dtseries.nii"
+        ],
+        "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*6*_bold.nii.gz": [
+          "sub-{SUBJECT}/ses-{SESSION}/func/sub-{SUBJECT}_ses-{SESSION}_task-rest_*run-*6*_space-fsLR_den-91k_bold.dtseries.nii"
+        ],
+      }
+    },
+    "Reports": {
+      "description": "HTML reports for visual quality control. Outputs in the top-level derivatives directory.",
+      "outputs": {
+        "sub-{SUBJECT}/ses-{SESSION}/anat/sub-{SUBJECT}_ses-{SESSION}*_T1w.nii.gz": [
+          "sub-{SUBJECT}.html",
+          "figures/"
+        ]
+      }
+    }
+  }
+}
