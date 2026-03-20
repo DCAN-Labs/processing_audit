@@ -2,4 +2,5 @@ s3_status_report.html
 .ipynb_checkpoints
 Untitled.ipynb
 /reports
-
+utils/__pycache__
+.venv
